@@ -58,7 +58,11 @@ const HomeScreen = () => {
                 </View>
 
                 <View style={styles.placeholderContainer}>
-                    <Text style={styles.iconPlaceholder}>🎣</Text>
+                    <Image
+                        source={require('../../assets/icon.png')}
+                        style={styles.logo}
+                        resizeMode="contain"
+                    />
                 </View>
 
                 <View style={styles.buttonContainer}>
@@ -109,8 +113,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    iconPlaceholder: {
-        fontSize: 80,
+    logo: {
+        width: 250,
+        height: 250,
     },
     buttonContainer: {
         gap: 16,
