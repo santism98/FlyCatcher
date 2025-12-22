@@ -50,15 +50,15 @@ const ChatScreen = () => {
     };
 
     return (
-        <SafeAreaView style={styles.container} edges={['top', 'left', 'right', 'bottom']}>
+        <SafeAreaView style={styles.container} edges={['top']}>
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>Chat de Pesca 🎣</Text>
             </View>
 
             <KeyboardAvoidingView
                 style={styles.keyboardView}
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
             >
                 <FlatList
                     ref={flatListRef}
@@ -78,6 +78,11 @@ const ChatScreen = () => {
                         placeholder="Pregunta sobre moscas..."
                         placeholderTextColor="#999"
                         multiline
+                        onFocus={() => {
+                            setTimeout(() => {
+                                flatListRef.current?.scrollToEnd({ animated: true });
+                            }, 100);
+                        }}
                     />
                     <TouchableOpacity
                         style={styles.sendButton}
