@@ -66,40 +66,36 @@ const ChatScreen = () => {
                 onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
                 onLayout={() => flatListRef.current?.scrollToEnd({ animated: true })}
                 style={styles.messagesList}
+                keyboardShouldPersistTaps="handled"
             />
 
-            <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
-            >
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        value={inputText}
-                        onChangeText={setInputText}
-                        placeholder="Pregunta sobre moscas..."
-                        placeholderTextColor="#999"
-                        multiline
-                        maxLength={500}
-                        onFocus={() => {
-                            setTimeout(() => {
-                                flatListRef.current?.scrollToEnd({ animated: true });
-                            }, 100);
-                        }}
-                    />
-                    <TouchableOpacity
-                        style={styles.sendButton}
-                        onPress={handleSend}
-                        disabled={loading}
-                    >
-                        {loading ? (
-                            <ActivityIndicator color="#fff" size="small" />
-                        ) : (
-                            <Text style={styles.sendButtonText}>Enviar</Text>
-                        )}
-                    </TouchableOpacity>
-                </View>
-            </KeyboardAvoidingView>
+            <View style={styles.inputContainer}>
+                <TextInput
+                    style={styles.input}
+                    value={inputText}
+                    onChangeText={setInputText}
+                    placeholder="Pregunta sobre moscas..."
+                    placeholderTextColor="#999"
+                    multiline
+                    maxLength={500}
+                    onFocus={() => {
+                        setTimeout(() => {
+                            flatListRef.current?.scrollToEnd({ animated: true });
+                        }, 300);
+                    }}
+                />
+                <TouchableOpacity
+                    style={styles.sendButton}
+                    onPress={handleSend}
+                    disabled={loading}
+                >
+                    {loading ? (
+                        <ActivityIndicator color="#fff" size="small" />
+                    ) : (
+                        <Text style={styles.sendButtonText}>Enviar</Text>
+                    )}
+                </TouchableOpacity>
+            </View>
         </View>
     );
 };
