@@ -50,26 +50,28 @@ const ChatScreen = () => {
     };
 
     return (
-        <SafeAreaView style={styles.container} edges={['top']}>
-            <View style={styles.header}>
-                <Text style={styles.headerTitle}>Chat de Pesca 🎣</Text>
-            </View>
+        <View style={styles.container}>
+            <SafeAreaView style={styles.safeArea} edges={['top']}>
+                <View style={styles.header}>
+                    <Text style={styles.headerTitle}>Chat de Pesca 🎣</Text>
+                </View>
+            </SafeAreaView>
+
+            <FlatList
+                ref={flatListRef}
+                data={messages}
+                renderItem={renderItem}
+                keyExtractor={(_, index) => index.toString()}
+                contentContainerStyle={styles.listContent}
+                onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+                onLayout={() => flatListRef.current?.scrollToEnd({ animated: true })}
+                style={styles.messagesList}
+            />
 
             <KeyboardAvoidingView
-                style={styles.keyboardView}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+                keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
             >
-                <FlatList
-                    ref={flatListRef}
-                    data={messages}
-                    renderItem={renderItem}
-                    keyExtractor={(_, index) => index.toString()}
-                    contentContainerStyle={styles.listContent}
-                    onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
-                    onLayout={() => flatListRef.current?.scrollToEnd({ animated: true })}
-                />
-
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={styles.input}
@@ -78,6 +80,7 @@ const ChatScreen = () => {
                         placeholder="Pregunta sobre moscas..."
                         placeholderTextColor="#999"
                         multiline
+                        maxLength={500}
                         onFocus={() => {
                             setTimeout(() => {
                                 flatListRef.current?.scrollToEnd({ animated: true });
@@ -97,13 +100,16 @@ const ChatScreen = () => {
                     </TouchableOpacity>
                 </View>
             </KeyboardAvoidingView>
-        </SafeAreaView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#fff',
+    },
+    safeArea: {
         backgroundColor: '#fff',
     },
     header: {
@@ -119,7 +125,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#2e7d32',
     },
-    keyboardView: {
+    messagesList: {
         flex: 1,
     },
     listContent: {
