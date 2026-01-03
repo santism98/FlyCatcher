@@ -109,7 +109,7 @@ const ResultScreen = ({ route, navigation }: Props) => {
 
                         {/* Receta de Montaje */}
                         <View style={styles.sectionContainer}>
-                            <Text style={styles.sectionTitle}>🪶 Receta de Montaje</Text>
+                            <Text style={styles.sectionTitle}>🪶 Pasos de Montaje</Text>
                             <View style={styles.instructionsContainer}>
                                 {result.mountingInstructions.map((instruction, index) => (
                                     <View key={index} style={styles.instructionRow}>

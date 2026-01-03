@@ -5,6 +5,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import * as ImagePicker from 'expo-image-picker';
 import { RootStackParamList } from '../types/navigation';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { auth } from '../config/firebase';
+import { signOut } from 'firebase/auth';
+import { runTestUpload } from '../services/TestUploadService';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -21,7 +24,7 @@ const HomeScreen = () => {
 
         const result = await ImagePicker.launchCameraAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
+            allowsEditing: false,
             quality: 0.8,
         });
 
@@ -40,12 +43,21 @@ const HomeScreen = () => {
 
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
+            allowsEditing: false,
             quality: 0.8,
         });
 
         if (!result.canceled && result.assets[0].uri) {
             navigation.navigate('Result', { imageUri: result.assets[0].uri });
+        }
+    }; // Fin de pickImage
+
+    const handleLogout = async () => {
+        try {
+            await signOut(auth);
+            // El listener de AppNavigator redirigirá automáticamente al Login
+        } catch (error) {
+            console.error("Error al cerrar sesión:", error);
         }
     };
 
@@ -76,6 +88,18 @@ const HomeScreen = () => {
 
                     <TouchableOpacity style={styles.tertiaryButton} onPress={() => navigation.navigate('Chat')}>
                         <Text style={styles.tertiaryButtonText}>💬 Chat con IA</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.historyButton} onPress={() => navigation.navigate('History')}>
+                        <Text style={styles.historyButtonText}>📜 Historial</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                        <Text style={styles.logoutButtonText}>🚪 Cerrar Sesión</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={[styles.logoutButton, { marginTop: 20, backgroundColor: '#fff3e0', borderColor: 'orange' }]} onPress={runTestUpload}>
+                        <Text style={[styles.logoutButtonText, { color: 'orange' }]}>⚠️ TEST FIREBASE</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -158,6 +182,31 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '600',
         color: '#2196F3',
+    },
+    historyButton: {
+        backgroundColor: '#fff3e0',
+        paddingVertical: 18,
+        borderRadius: 16,
+        alignItems: 'center',
+    },
+    historyButtonText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#f57c00',
+    },
+    logoutButton: {
+        backgroundColor: '#ffebee',
+        paddingVertical: 18,
+        borderRadius: 16,
+        alignItems: 'center',
+        marginTop: 10,
+        borderWidth: 1,
+        borderColor: '#ffcdd2'
+    },
+    logoutButtonText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#c62828',
     },
 });
 

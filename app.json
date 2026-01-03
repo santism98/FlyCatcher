@@ -2,6 +2,7 @@
   "expo": {
     "name": "FlyCatcher",
     "slug": "FlyCatcher",
+    "scheme": "flycatcher",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -22,10 +23,19 @@
       },
       "softwareKeyboardLayoutMode": "pan",
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "Ycom.ukasan.flycatcher"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-web-browser"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "260b4528-45c7-40ab-888b-c8d011498003"
+      }
     }
   }
 }

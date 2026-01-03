@@ -1,5 +1,8 @@
 import { readAsStringAsync } from 'expo-file-system/legacy';
 import { OPENAI_API_KEY } from '../config';
+import { db, storage, auth } from '../config/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL, uploadString } from 'firebase/storage';
 
 export interface FlyAnalysisResult {
     flyIdentification: {
@@ -145,6 +148,13 @@ export const analyzeFlyImage = async (imageUri: string): Promise<FlyAnalysisResu
         }
 
         const result: FlyAnalysisResult = JSON.parse(content);
+
+        // Guardar automáticamente en Firebase si la confianza es aceptable (> 0.4)
+        // o si simplemente queremos historial de todo.
+        if (result.flyIdentification.confidence > 0.4) {
+            saveFlyAnalysis(result, imageUri).catch(e => console.error("Error guardando en historial:", e));
+        }
+
         return result;
 
     } catch (error) {
@@ -192,5 +202,68 @@ export const sendChatMessage = async (messages: ChatMessage[]): Promise<string> 
     } catch (error) {
         console.error('Error en sendChatMessage:', error);
         throw error;
+    }
+};
+
+export const saveFlyAnalysis = async (analysis: FlyAnalysisResult, localImageUri: string) => {
+    try {
+        // 1. Subir imagen a Storage
+        const imageUrl = await uploadImage(localImageUri);
+
+        // 2. Guardar metadatos en Firestore
+        const docRef = await addDoc(collection(db, "datosMoscas"), {
+            ...analysis,
+            imageUrl, // URL remota
+            localImageUri, // Mantenemos la local por si acaso (para uso inmediato offline si se quisiera optimizar)
+            userId: auth.currentUser?.uid, // Vinculamos la captura al usuario actual
+            createdAt: serverTimestamp(),
+            searchTags: [
+                analysis.flyIdentification.imitatedInsect.order,
+                analysis.flyIdentification.imitatedInsect.family,
+                analysis.flyIdentification.commonName
+            ].filter(Boolean)
+        });
+        console.log("Documento guardado con ID: ", docRef.id);
+        return docRef.id;
+    } catch (e) {
+        console.error("Error guardando análisis: ", e);
+        throw e;
+    }
+};
+
+const uploadImage = async (uri: string): Promise<string> => {
+    try {
+        console.log("Iniciando subida de imagen (XHR):", uri);
+
+        const blob: any = await new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.onload = function () {
+                resolve(xhr.response);
+            };
+            xhr.onerror = function (e) {
+                console.error("XHR Error:", e);
+                reject(new TypeError("Network request failed"));
+            };
+            xhr.responseType = "blob";
+            xhr.open("GET", uri, true);
+            xhr.send(null);
+        });
+
+        const filename = uri.substring(uri.lastIndexOf('/') + 1);
+        const storageRef = ref(storage, `fly_captures/${Date.now()}_${filename}`);
+
+        await uploadBytes(storageRef, blob);
+
+        // Cerramos el blob para liberar memoria
+        if (blob.close) {
+            blob.close();
+        }
+
+        const downloadUrl = await getDownloadURL(storageRef);
+        console.log('Imagen subida con éxito:', downloadUrl);
+        return downloadUrl;
+    } catch (error: any) {
+        console.error("Error subiendo imagen:", error);
+        return '';
     }
 };
